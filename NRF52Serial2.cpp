@@ -226,6 +226,15 @@ namespace imqopen
 
         switch (baudrate)
         {
+        case 1200:
+            baud = NRF_UARTE_BAUDRATE_1200;
+            break;
+        case 2400:
+            baud = NRF_UARTE_BAUDRATE_2400;
+            break;
+        case 4800:
+            baud = NRF_UARTE_BAUDRATE_4800;
+            break;
         case 9600:
             baud = NRF_UARTE_BAUDRATE_9600;
             break;
