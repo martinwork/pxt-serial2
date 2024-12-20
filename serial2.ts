@@ -7,126 +7,91 @@
 namespace serial2 {
 
     /**
-     * Read a line of text from the serial port and return the buffer when the delimiter is met.
-     * @param delimiter text delimiter that separates each text chunk
+     * The string used to mark a new line, default is \r\n
      */
-    //% help=serial/read-until
-    //% blockId=serial2_read_until block="serial2|read until %delimiter=serial_delimiter_conv"
-    //% weight=19 shim=_serial2::readUntil
-    export function readUntil(delimiter: string): string {
-        return ""
+    export let NEW_LINE = "\r\n";
+    export let NEW_LINE_DELIMITER: Delimiters = Delimiters.NewLine;
+    let writeLinePadding = 32;
+
+    /**
+    * Print a line of text to the serial port
+    * @param value to send over serial
+    */
+    //% weight=90
+    //% help=serial/write-line blockGap=8
+    //% blockId=serial2_writeline block="serial2|write line %text"
+    //% text.shadowOptions.toString=true
+    export function writeLine(text: string): void {
+        if (!text) text = "";
+        serial2.writeString(text);
+        // pad data to the 32 byte boundary
+        // to ensure apps receive the packet
+        if (writeLinePadding > 0) {
+            let r = (writeLinePadding - (text.length + NEW_LINE.length) % writeLinePadding) % writeLinePadding;
+            for (let i = 0; i < r; ++i)
+                serial2.writeString(" ");
+        }
+        serial2.writeString(NEW_LINE);
     }
 
     /**
-     * Read the buffered received data as a string
+     * Sets the padding length for lines sent with "write line".
+     * @param length the number of bytes alignment, eg: 0
+     *
      */
-    //% help=serial/read-string
-    //% blockId=serial2_read_buffer block="serial2|read string"
-    //% weight=18 shim=_serial2::readString
-    export function readString(): string {
-        return ""
+    //% weight=1
+    //% help=serial/set-write-line-padding
+    //% blockId=serial2WriteNewLinePadding block="serial2 set write line padding to $length"
+    //% advanced=true
+    //% length.min=0 length.max=128
+    export function setWriteLinePadding(length: number) {
+        writeLinePadding = length | 0;
     }
 
     /**
-     * Register an event to be fired when one of the delimiter is matched.
-     * @param delimiters the characters to match received characters against.
+     * Print a numeric value to the serial port
      */
-    //% help=serial/on-data-received
-    //% weight=18 blockId=serial2_on_data_received block="serial2|on data received %delimiters=serial_delimiter_conv" shim=_serial2::onDataReceived
-    export function onDataReceived(delimiters: string, body: () => void): void {
-        return
+    //% help=serial/write-number
+    //% weight=89 blockGap=8
+    //% blockId=serial2_writenumber block="serial2|write number %value"
+    export function writeNumber(value: number): void {
+        writeString(value.toString());
     }
 
     /**
-     * Send a piece of text through the serial connection.
+     * Print an array of numeric values as CSV to the serial port
      */
-    //% help=serial/write-string
-    //% weight=87 blockGap=8
-    //% blockId=serial2_writestring block="serial2|write string %text"
-    //% text.shadowOptions.toString=true shim=_serial2::writeString
-    export function writeString(text: string): void {
-        return
+    //% help=serial/write-numbers
+    //% weight=86
+    //% blockId=serial2_writenumbers block="serial2|write numbers %values"
+    export function writeNumbers(values: number[]): void {
+        if (!values) return;
+        for (let i = 0; i < values.length; ++i) {
+            if (i > 0) writeString(",");
+            writeNumber(values[i]);
+        }
+        writeLine("")
     }
 
     /**
-     * Send a buffer through serial connection
+     * Write a name:value pair as a line to the serial port.
+     * @param name name of the value stream, eg: x
+     * @param value to write
      */
-    //% blockId=serial2_writebuffer block="serial2|write buffer %buffer=serial_readbuffer"
-    //% help=serial/write-buffer advanced=true weight=6 shim=_serial2::writeBuffer
-    export function writeBuffer(buffer: Buffer): void {
-        return
+    //% weight=88 blockGap=8
+    //% help=serial/write-value
+    //% blockId=serial2_writevalue block="serial2|write value %name|= %value"
+    export function writeValue(name: string, value: number): void {
+        writeLine((name ? name + ":" : "") + value);
     }
 
     /**
-     * Read multiple characters from the receive buffer.
-     * If length is positive, pauses until enough characters are present.
-     * @param length default buffer length
+     * Read a line of text from the serial port.
      */
-    //% blockId=serial2_readbuffer block="serial2|read buffer %length"
-    //% help=serial/read-buffer advanced=true weight=5 shim=_serial2::readBuffer
-    export function readBuffer(length: number): Buffer {
-        return null
-    }
-
-    /**
-     * Set the serial input and output to use pins instead of the USB connection.
-     * @param tx the new transmission pin, eg: SerialPin.P0
-     * @param rx the new reception pin, eg: SerialPin.P1
-     * @param rate the new baud rate. eg: 115200
-     */
-    //% weight=10
-    //% help=serial/redirect
-    //% blockId=serial2_redirect block="serial2|redirect to|TX %tx|RX %rx|at baud rate %rate"
-    //% blockExternalInputs=1
-    //% tx.fieldEditor="gridpicker" tx.fieldOptions.columns=3
-    //% tx.fieldOptions.tooltips="false"
-    //% rx.fieldEditor="gridpicker" rx.fieldOptions.columns=3
-    //% rx.fieldOptions.tooltips="false"
-    //% blockGap=8 shim=_serial2::redirect
-    export function redirect(tx: SerialPin, rx: SerialPin, rate: BaudRate): void {
-        return
-    }
-
-    /**
-     * Set the baud rate of the serial port
-     */
-    //% weight=10
-    //% blockId=serial2_setbaudrate block="serial2|set baud rate %rate"
-    //% blockGap=8 inlineInputMode=inline
-    //% help=serial/set-baud-rate
-    //% group="Configuration" advanced=true shim=_serial2::setBaudRate
-    export function setBaudRate(rate: BaudRate): void {
-        return
-    }
-
-    /**
-     * Direct the serial input and output to use the USB connection.
-     */
-    //% weight=9 help=serial/redirect-to-usb
-    //% blockId=serial2_redirect_to_usb block="serial2|redirect to USB" shim=_serial2::redirectToUSB
-    export function redirectToUSB(): void {
-        return
-    }
-
-    /**
-     * Sets the size of the RX buffer in bytes
-     * @param size length of the rx buffer in bytes, eg: 32
-     */
-    //% help=serial/set-rx-buffer-size
-    //% blockId=serial2SetRxBufferSize block="serial set rx buffer size to $size"
-    //% advanced=true shim=_serial2::setRxBufferSize
-    export function setRxBufferSize(size: number): void {
-        return
-    }
-
-    /**
-     * Sets the size of the TX buffer in bytes
-     * @param size length of the tx buffer in bytes, eg: 32
-     */
-    //% help=serial/set-tx-buffer-size
-    //% blockId=serial2SetTxBufferSize block="serial set tx buffer size to $size"
-    //% advanced=true shim=_serial2::setTxBufferSize
-    export function setTxBufferSize(size: number): void {
-        return
+    //% help=serial/read-line
+    //% blockId=serial2_read_line block="serial2|read line"
+    //% weight=20 blockGap=8
+    export function readLine(): string {
+        return serial2.readUntil(serial.delimiters(NEW_LINE_DELIMITER));
     }
 }

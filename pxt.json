@@ -8,6 +8,7 @@
     },
     "files": [
         "serial2.ts",
+        "serial2_shim.ts",
         "serial2.cpp",
         "NRF52Serial2.h",
         "NRF52Serial2.cpp",
