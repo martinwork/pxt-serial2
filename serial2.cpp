@@ -13,10 +13,39 @@ enum BaudRate
 {
 };
 
+// TODO:
+#if 0 
+enum EventBusSource
+{
+    //% blockIdentity="control.eventSourceId"
+    SERIAL2_DEVICE_ID = IMQOPEN_NRF52SERIAL2_DEFAULT_DEVICE_ID,
+};
+
+enum EventBusValue
+{
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_DELIM_MATCH = IMQOPEN_NRF52SERIAL2_EVT_DELIM_MATCH,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_HEAD_MATCH = IMQOPEN_NRF52SERIAL2_EVT_HEAD_MATCH,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_RX_FULL = IMQOPEN_NRF52SERIAL2_EVT_RX_FULL,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_DATA_RECEIVED = IMQOPEN_NRF52SERIAL2_EVT_DATA_RECEIVED,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_ERROR_OVERRUN = IMQOPEN_NRF52SERIAL2_EVT_ERROR_OVERRUN,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_ERROR_PARITY = IMQOPEN_NRF52SERIAL2_EVT_ERROR_PARITY,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_ERROR_FRAMING = IMQOPEN_NRF52SERIAL2_EVT_ERROR_FRAMING,
+    //% blockIdentity="control.eventValueId"
+    SERIAL2_EVT_ERROR_BREAK = IMQOPEN_NRF52SERIAL2_EVT_ERROR_BREAK,
+};
+#endif
+
 namespace _serial2
 {
 
-    imqopen::NRF52Serial serial2(uBit.io.P13, uBit.io.P14);
+    imqopen::NRF52Serial2 serial2(uBit.io.P13, uBit.io.P14);
     // bool is_redirected;
 
     // note that at least one // followed by % is needed per declaration!

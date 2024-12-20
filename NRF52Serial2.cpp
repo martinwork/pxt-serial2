@@ -7,6 +7,9 @@ using namespace codal;
 
 extern int8_t target_get_irq_disabled();
 
+// Same with uBit.serial
+#define _DEFAULT_IRQ_PRIORITY 2
+
 namespace imqopen
 {
 
@@ -18,8 +21,9 @@ namespace imqopen
      * @param rx the pin instance to use for reception
      *
      **/
-    NRF52Serial::NRF52Serial(Pin &tx, Pin &rx, NRF_UARTE_Type *device)
-        : Serial(tx, rx), is_tx_in_progress_(false), bytesProcessed(0), p_uarte_(NULL)
+    NRF52Serial2::NRF52Serial2(Pin &tx, Pin &rx, uint16_t id, NRF_UARTE_Type *device)
+        : Serial(tx, rx, CODAL_SERIAL_DEFAULT_BUFFER_SIZE, CODAL_SERIAL_DEFAULT_BUFFER_SIZE, id),
+          is_tx_in_progress_(false), bytesProcessed(0), p_uarte_(NULL)
     {
         if (device != NULL)
             p_uarte_ = (NRF_UARTE_Type *)allocate_peripheral((void *)device);
@@ -41,6 +45,10 @@ namespace imqopen
 
         nrf_uarte_baudrate_set(p_uarte_, NRF_UARTE_BAUDRATE_115200);
         nrf_uarte_configure(p_uarte_, &hal_config);
+
+        // To be compatible with Serial.redirect()
+        rx.setPull(PullMode::Up);
+
         configurePins(tx, rx);
 
         nrf_uarte_event_clear(p_uarte_, NRF_UARTE_EVENT_RXDRDY);
@@ -64,14 +72,14 @@ namespace imqopen
 
         IRQn_Type IRQn = get_alloc_peri_irqn(p_uarte_);
 
-        NVIC_SetPriority(IRQn, 1);
+        NVIC_SetPriority(IRQn, _DEFAULT_IRQ_PRIORITY);
         NVIC_ClearPendingIRQ(IRQn);
         NVIC_EnableIRQ(IRQn);
 
         nrf_uarte_enable(p_uarte_);
     }
 
-    NRF52Serial::~NRF52Serial()
+    NRF52Serial2::~NRF52Serial2()
     {
         nrf_uarte_int_disable(p_uarte_, NRF_UARTE_INT_RXDRDY_MASK |
                                             NRF_UARTE_INT_ENDRX_MASK |
@@ -97,9 +105,9 @@ namespace imqopen
         free_alloc_peri(p_uarte_);
     }
 
-    void NRF52Serial::_irqHandler(void *self_)
+    void NRF52Serial2::_irqHandler(void *self_)
     {
-        NRF52Serial *self = (NRF52Serial *)self_;
+        NRF52Serial2 *self = (NRF52Serial2 *)self_;
         NRF_UARTE_Type *p_uarte = self->p_uarte_;
 
         while (nrf_uarte_event_check(p_uarte, NRF_UARTE_EVENT_RXDRDY) && self->bytesProcessed < CONFIG_SERIAL_DMA_BUFFER_SIZE)
@@ -123,7 +131,8 @@ namespace imqopen
         if (nrf_uarte_event_check(p_uarte, NRF_UARTE_EVENT_ERROR))
         {
             nrf_uarte_event_clear(p_uarte, NRF_UARTE_EVENT_ERROR);
-            nrf_uarte_errorsrc_get_and_clear(p_uarte);
+            uint32_t src = nrf_uarte_errorsrc_get_and_clear(p_uarte);
+            self->errorDetected(src);
         }
 
         if (nrf_uarte_event_check(p_uarte, NRF_UARTE_EVENT_RXTO))
@@ -155,7 +164,7 @@ namespace imqopen
         }
     }
 
-    int NRF52Serial::enableInterrupt(SerialInterruptType t)
+    int NRF52Serial2::enableInterrupt(SerialInterruptType t)
     {
         if (t == RxInterrupt)
         {
@@ -191,7 +200,7 @@ namespace imqopen
         return DEVICE_OK;
     }
 
-    int NRF52Serial::disableInterrupt(SerialInterruptType t)
+    int NRF52Serial2::disableInterrupt(SerialInterruptType t)
     {
         if (t == RxInterrupt)
         {
@@ -205,13 +214,13 @@ namespace imqopen
             // In addition, using a function that does not use the codal::Serial structure,
             // such as printf and putc, causes problems,
             // so it is not right to turn on and off the driver interrupts in this function.
-            // NRF52Serial::configurePins assumes the interrupt is not disabled
+            // NRF52Serial2::configurePins assumes the interrupt is not disabled
         }
 
         return DEVICE_OK;
     }
 
-    int NRF52Serial::setBaudrate(uint32_t baudrate)
+    int NRF52Serial2::setBaudrate(uint32_t baudrate)
     {
         nrf_uarte_baudrate_t baud = NRF_UARTE_BAUDRATE_115200;
 
@@ -247,11 +256,11 @@ namespace imqopen
         return DEVICE_OK;
     }
 
-    int NRF52Serial::configurePins(Pin &tx, Pin &rx)
+    int NRF52Serial2::configurePins(Pin &tx, Pin &rx)
     {
         // Serial::redirect surrounds its call to this function with
         // disableInterrupt(TxInterrupt) and enableInterrupt(TxInterrupt)
-        // but NRF52Serial's implementation of those doesn't change the interrupt.
+        // but NRF52Serial2's implementation of those doesn't change the interrupt.
         // When we get here tx is locked, but the tx interrupt is still working to empty the buffer
         while (txBufferedSize() > 0 || is_tx_in_progress_) /*wait*/
             ;
@@ -261,7 +270,7 @@ namespace imqopen
         return DEVICE_OK;
     }
 
-    int NRF52Serial::putc(char c)
+    int NRF52Serial2::putc(char c)
     {
         int res = DEVICE_OK;
 
@@ -306,17 +315,37 @@ namespace imqopen
         return res;
     }
 
-    int NRF52Serial::getc()
+    int NRF52Serial2::getc()
     {
         return this->getChar(codal::SerialMode::ASYNC);
     }
 
-    void NRF52Serial::dataReceivedDMA()
+    void NRF52Serial2::errorDetected(uint32_t src)
+    {
+        if (src & NRF_UARTE_ERROR_OVERRUN_MASK)
+        {
+            Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_OVERRUN);
+        }
+        if (src & NRF_UARTE_ERROR_PARITY_MASK)
+        {
+            Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_PARITY);
+        }
+        if (src & NRF_UARTE_ERROR_FRAMING_MASK)
+        {
+            Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_FRAMING);
+        }
+        if (src & NRF_UARTE_ERROR_BREAK_MASK)
+        {
+            Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_BREAK);
+        }
+    }
+
+    void NRF52Serial2::dataReceivedDMA()
     {
         dataReceived(dmaBuffer[bytesProcessed++]);
     }
 
-    void NRF52Serial::updateRxBufferAfterENDRX()
+    void NRF52Serial2::updateRxBufferAfterENDRX()
     {
         // A DMA transfer has been completed.
         // Determine the number of bytes the UART hardware sucessfuly transferred.
@@ -338,7 +367,7 @@ namespace imqopen
         bytesProcessed = 0;
     }
 
-    void NRF52Serial::updateRxBufferAfterRXSTARTED()
+    void NRF52Serial2::updateRxBufferAfterRXSTARTED()
     {
         nrf_uarte_rx_buffer_set(p_uarte_, dmaBuffer, CONFIG_SERIAL_DMA_BUFFER_SIZE);
     }
@@ -349,7 +378,7 @@ namespace imqopen
      * If CODAL_SERIAL_STATUS_DEEPSLEEP is set, then the peripheral will remain active during deep
      * sleep, and will wake the processor if new data is received.
      */
-    int NRF52Serial::setSleep(bool doSleep)
+    int NRF52Serial2::setSleep(bool doSleep)
     {
         IRQn_Type IRQn = get_alloc_peri_irqn(p_uarte_);
 
