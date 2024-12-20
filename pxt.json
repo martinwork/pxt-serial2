@@ -21,7 +21,8 @@
     ],
     "public": true,
     "targetVersions": {
-        "targetId": "microbit"
+        "targetId": "microbit",
+        "target": "7.0.51"
     },
     "supportedTargets": [
         "microbit"
