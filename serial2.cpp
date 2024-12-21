@@ -14,7 +14,7 @@ enum BaudRate
 };
 
 // TODO:
-#if 0 
+#if 0
 enum EventBusSource
 {
     //% blockIdentity="control.eventSourceId"
@@ -40,8 +40,7 @@ enum EventBusValue
     //% blockIdentity="control.eventValueId"
     SERIAL2_EVT_ERROR_BREAK = IMQOPEN_NRF52SERIAL2_EVT_ERROR_BREAK,
 };
-#endif
-
+#else
 enum EventBusSource
 {
     //% blockIdentity="control.eventSourceId"
@@ -67,6 +66,7 @@ enum EventBusValue
     //% blockIdentity="control.eventValueId"
     SERIAL2_EVT_ERROR_BREAK = 13,
 };
+#endif
 
 namespace _serial2
 {
@@ -106,7 +106,7 @@ namespace _serial2
     void onDataReceived(String delimiters, Action body)
     {
         serial2.eventOn(MSTR(delimiters));
-        registerWithDal(MICROBIT_ID_SERIAL, MICROBIT_SERIAL_EVT_DELIM_MATCH, body);
+        registerWithDal(SERIAL2_DEVICE_ID, MICROBIT_SERIAL_EVT_DELIM_MATCH, body);
         // lazy initialization of serial buffers
         serial2.read(MicroBitSerialMode::ASYNC);
     }

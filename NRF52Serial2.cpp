@@ -335,10 +335,10 @@ namespace imqopen
         {
             Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_OVERRUN);
         }
-        if (src & NRF_UARTE_ERROR_PARITY_MASK)
-        {
-            Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_PARITY);
-        }
+        // if (src & NRF_UARTE_ERROR_PARITY_MASK)
+        // {
+        //     Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_PARITY);
+        // }
         if (src & NRF_UARTE_ERROR_FRAMING_MASK)
         {
             Event(this->id, IMQOPEN_NRF52SERIAL2_EVT_ERROR_FRAMING);

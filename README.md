@@ -23,6 +23,7 @@ are basically the same as for `serial`. The differences are described here and i
 - Default pins. The default pins are P13 (TX) and P14 (RX).
 - Pull-up on RX. To be compatible with Micro:bit V1 as well as `serial.redirect()`, the
  internal pull-up resistor of RX pin is enabled.
+- Supports baud rate below 9600: 1200, 2400, 4800
 
 ### Device ID and Events
 
@@ -37,7 +38,6 @@ The following events are provided:
 `SERIAL2_EVT_RX_FULL` | `CODAL_SERIAL_EVT_DELIM_MATCH` (`3`) | 
 `SERIAL2_EVT_DATA_RECEIVED` | `CODAL_SERIAL_EVT_DELIM_MATCH` (`4`) | 
 `SERIAL2_EVT_ERROR_OVERRUN` | `10` |  Fired when an overrun error occurs
-`SERIAL2_EVT_ERROR_PARITY` | `11` | Fired when a parity error occurs
 `SERIAL2_EVT_ERROR_FRAMING` | `12` | Fired when a frame error occurs
 `SERIAL2_EVT_ERROR_BREAK` | `13` | Fired when a break condition occurs
 
