@@ -41,7 +41,13 @@ The following events are provided:
 `SERIAL2_EVT_ERROR_FRAMING` | `12` | Fired when a frame error occurs
 `SERIAL2_EVT_ERROR_BREAK` | `13` | Fired when a break condition occurs
 
-The device ID and events may be used with `control.onEvent()`.
+The device ID and events may be used with `control.onEvent()`. For example
+
+```TypeScript
+control.onEvent(EventBusSource.SERIAL2_DEVICE_ID, EventBusValue.SERIAL2_EVT_ERROR_FRAMING, function () {
+    serial2.writeString('!!frame error!!\n')
+})
+```
 
 ## License
 
@@ -51,4 +57,3 @@ MIT
 
 * for PXT/microbit
 (Micro:bit V2 only)
-<script src="https://makecode.com/gh-pages-embed.js"></script><script>makeCodeRender("{{ site.makecode.home_url }}", "{{ site.github.owner_name }}/{{ site.github.repository_name }}");</script>
