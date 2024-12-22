@@ -68,7 +68,7 @@ enum EventBusValue
 };
 #endif
 
-namespace _serial2
+namespace serial2
 {
 
     imqopen::NRF52Serial2 serial2(uBit.io.P13, uBit.io.P14);
@@ -76,7 +76,7 @@ namespace _serial2
 
     // note that at least one // followed by % is needed per declaration!
 
-    /**
+    /*
      * Read a line of text from the serial port and return the buffer when the delimiter is met.
      * @param delimiter text delimiter that separates each text chunk
      */
@@ -86,7 +86,7 @@ namespace _serial2
         return PSTR(serial2.readUntil(MSTR(delimiter)));
     }
 
-    /**
+    /*
      * Read the buffered received data as a string
      */
     //%
@@ -98,7 +98,7 @@ namespace _serial2
         return PSTR(serial2.read(n, MicroBitSerialMode::ASYNC));
     }
 
-    /**
+    /*
      * Register an event to be fired when one of the delimiter is matched.
      * @param delimiters the characters to match received characters against.
      */
@@ -111,7 +111,7 @@ namespace _serial2
         serial2.read(MicroBitSerialMode::ASYNC);
     }
 
-    /**
+    /*
      * Send a piece of text through the serial connection.
      */
     //%
@@ -123,7 +123,7 @@ namespace _serial2
         serial2.send(MSTR(text));
     }
 
-    /**
+    /*
      * Send a buffer through serial connection
      */
     //%
@@ -135,7 +135,7 @@ namespace _serial2
         serial2.send(buffer->data, buffer->length);
     }
 
-    /**
+    /*
      * Read multiple characters from the receive buffer.
      * If length is positive, pauses until enough characters are present.
      * @param length default buffer length
@@ -163,7 +163,7 @@ namespace _serial2
         return res;
     }
 
-    /**
+    /*
      * Set the serial input and output to use pins instead of the USB connection.
      * @param tx the new transmission pin, eg: SerialPin.P0
      * @param rx the new reception pin, eg: SerialPin.P1
@@ -181,7 +181,7 @@ namespace _serial2
         serial2.setBaud(rate);
     }
 
-    /**
+    /*
     Set the baud rate of the serial port
     */
     //%
@@ -190,7 +190,7 @@ namespace _serial2
         serial2.setBaud(rate);
     }
 
-    /**
+    /*
      * Direct the serial input and output to use the USB connection.
      */
     //%
@@ -201,7 +201,7 @@ namespace _serial2
         serial2.setBaud(115200);
     }
 
-    /**
+    /*
      * Sets the size of the RX buffer in bytes
      * @param size length of the rx buffer in bytes, eg: 32
      */
@@ -211,7 +211,7 @@ namespace _serial2
         serial2.setRxBufferSize(size);
     }
 
-    /**
+    /*
      * Sets the size of the TX buffer in bytes
      * @param size length of the tx buffer in bytes, eg: 32
      */
@@ -221,4 +221,4 @@ namespace _serial2
         serial2.setTxBufferSize(size);
     }
 
-} // namespace _serial2
+} // namespace serial2

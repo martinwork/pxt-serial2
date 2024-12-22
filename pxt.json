@@ -12,7 +12,6 @@
         "serial2.cpp",
         "NRF52Serial2.h",
         "NRF52Serial2.cpp",
-        "shims.d.ts",
         "enums.d.ts",
         "README.md"
     ],

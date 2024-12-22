@@ -7,7 +7,7 @@ namespace serial2 {
      */
     //% help=serial/read-until
     //% blockId=serial2_read_until block="serial2|read until %delimiter=serial_delimiter_conv"
-    //% weight=19 shim=_serial2::readUntil
+    //% weight=19 shim=serial2::readUntil
     export function readUntil(delimiter: string): string {
         return ""
     }
@@ -17,7 +17,7 @@ namespace serial2 {
      */
     //% help=serial/read-string
     //% blockId=serial2_read_buffer block="serial2|read string"
-    //% weight=18 shim=_serial2::readString
+    //% weight=18 shim=serial2::readString
     export function readString(): string {
         return ""
     }
@@ -27,7 +27,7 @@ namespace serial2 {
      * @param delimiters the characters to match received characters against.
      */
     //% help=serial/on-data-received
-    //% weight=18 blockId=serial2_on_data_received block="serial2|on data received %delimiters=serial_delimiter_conv" shim=_serial2::onDataReceived
+    //% weight=18 blockId=serial2_on_data_received block="serial2|on data received %delimiters=serial_delimiter_conv" shim=serial2::onDataReceived
     export function onDataReceived(delimiters: string, body: () => void): void {
         return
     }
@@ -38,7 +38,7 @@ namespace serial2 {
     //% help=serial/write-string
     //% weight=87 blockGap=8
     //% blockId=serial2_writestring block="serial2|write string %text"
-    //% text.shadowOptions.toString=true shim=_serial2::writeString
+    //% text.shadowOptions.toString=true shim=serial2::writeString
     export function writeString(text: string): void {
         return
     }
@@ -47,7 +47,7 @@ namespace serial2 {
      * Send a buffer through serial connection
      */
     //% blockId=serial2_writebuffer block="serial2|write buffer %buffer=serial_readbuffer"
-    //% help=serial/write-buffer advanced=true weight=6 shim=_serial2::writeBuffer
+    //% help=serial/write-buffer advanced=true weight=6 shim=serial2::writeBuffer
     export function writeBuffer(buffer: Buffer): void {
         return
     }
@@ -58,7 +58,7 @@ namespace serial2 {
      * @param length default buffer length
      */
     //% blockId=serial2_readbuffer block="serial2|read buffer %length"
-    //% help=serial/read-buffer advanced=true weight=5 shim=_serial2::readBuffer
+    //% help=serial/read-buffer advanced=true weight=5 shim=serial2::readBuffer
     export function readBuffer(length: number): Buffer {
         return null
     }
@@ -77,7 +77,7 @@ namespace serial2 {
     //% tx.fieldOptions.tooltips="false"
     //% rx.fieldEditor="gridpicker" rx.fieldOptions.columns=3
     //% rx.fieldOptions.tooltips="false"
-    //% blockGap=8 shim=_serial2::redirect
+    //% blockGap=8 shim=serial2::redirect
     export function redirect(tx: SerialPin, rx: SerialPin, rate: BaudRate): void {
         return
     }
@@ -89,7 +89,7 @@ namespace serial2 {
     //% blockId=serial2_setbaudrate block="serial2|set baud rate %rate"
     //% blockGap=8 inlineInputMode=inline
     //% help=serial/set-baud-rate
-    //% group="Configuration" advanced=true shim=_serial2::setBaudRate
+    //% group="Configuration" advanced=true shim=serial2::setBaudRate
     export function setBaudRate(rate: BaudRate): void {
         return
     }
@@ -98,7 +98,7 @@ namespace serial2 {
      * Direct the serial input and output to use the USB connection.
      */
     //% weight=9 help=serial/redirect-to-usb
-    //% blockId=serial2_redirect_to_usb block="serial2|redirect to USB" shim=_serial2::redirectToUSB
+    //% blockId=serial2_redirect_to_usb block="serial2|redirect to USB" shim=serial2::redirectToUSB
     export function redirectToUSB(): void {
         return
     }
@@ -109,7 +109,7 @@ namespace serial2 {
      */
     //% help=serial/set-rx-buffer-size
     //% blockId=serial2SetRxBufferSize block="serial set rx buffer size to $size"
-    //% advanced=true shim=_serial2::setRxBufferSize
+    //% advanced=true shim=serial2::setRxBufferSize
     export function setRxBufferSize(size: number): void {
         return
     }
@@ -120,7 +120,7 @@ namespace serial2 {
      */
     //% help=serial/set-tx-buffer-size
     //% blockId=serial2SetTxBufferSize block="serial set tx buffer size to $size"
-    //% advanced=true shim=_serial2::setTxBufferSize
+    //% advanced=true shim=serial2::setTxBufferSize
     export function setTxBufferSize(size: number): void {
         return
     }
